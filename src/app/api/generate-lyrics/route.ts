@@ -3,13 +3,17 @@ import { getGeminiModel } from '@/lib/gemini';
 
 export async function POST(req: NextRequest) {
   try {
-    const { theme, genre, artist } = await req.json();
-
+    // 1. Check API Key
     if (!process.env.GEMINI_API_KEY) {
-      return NextResponse.json({ 
-        error: 'GEMINI_API_KEY eksik. Lütfen Vercel veya .env.local ayarlarınızı kontrol edin.' 
-      }, { status: 500 });
+      console.error('❌ GEMINI_API_KEY eksik!');
+      return NextResponse.json(
+        { error: 'API key yapılandırılmamış. Lütfen .env.local veya Vercel ayarlarınızı kontrol edin.' },
+        { status: 500 }
+      );
     }
+
+    const { theme, genre, artist } = await req.json();
+    console.log('📝 İstek:', { theme, genre, artist });
 
     const model = getGeminiModel();
 
@@ -36,26 +40,37 @@ Format:
 
 SADECE şarkı sözlerini yaz, başka açıklama yapma.`;
 
+    console.log('⏳ Gemini API çağrısı yapılıyor...');
+
     const result = await model.generateContent(prompt);
     const lyrics = result.response.text();
 
-    return NextResponse.json({ lyrics });
-  } catch (error: unknown) {
-    console.error('Gemini error:', error);
-    
-    if (error instanceof Error && error.message?.includes('API key not valid')) {
-      return NextResponse.json({ 
-        error: 'Gemini API anahtarı geçersiz. Lütfen .env.local dosyasındaki GEMINI_API_KEY değerini kontrol edin.' 
-      }, { status: 401 });
-    }
+    console.log('✅ Sonuç alındı:', lyrics.substring(0, 50) + '...');
 
-    if (error instanceof Error && (error.message?.includes('429') || error.message?.includes('quota'))) {
+    return NextResponse.json({ lyrics });
+  } catch (error: any) {
+    console.error('❌ Gemini Hatası:', error);
+    
+    // Kota aşımı (Rate limit)
+    if (error.message?.includes('429') || error.message?.includes('quota')) {
       return NextResponse.json({ 
-        error: 'Gemini API kullanım kotası doldu (Free Tier). Lütfen 1 dakika bekleyip tekrar deneyin veya ücretli plana geçin.' 
+        error: 'Gemini API kullanım kotası doldu (Free Tier). Lütfen 30 saniye bekleyip tekrar deneyin.' 
       }, { status: 429 });
     }
 
-    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu';
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    // Geçersiz anahtar
+    if (error.message?.includes('API key not valid')) {
+      return NextResponse.json({ 
+        error: 'Gemini API anahtarı geçersiz. Lütfen anahtarınızı kontrol edin.' 
+      }, { status: 401 });
+    }
+
+    return NextResponse.json(
+      {
+        error: error.message || 'Bilinmeyen bir hata oluştu',
+        details: error.status ? `HTTP ${error.status}` : undefined
+      },
+      { status: 500 }
+    );
   }
 }
