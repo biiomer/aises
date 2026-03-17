@@ -14,10 +14,12 @@ export default function SongGeneratorForm() {
   const [artist, setArtist] = useState('yodel');
   const [lyrics, setLyrics] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
 
   const handleGenerateLyrics = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch('/api/generate-lyrics', {
         method: 'POST',
@@ -25,12 +27,18 @@ export default function SongGeneratorForm() {
         body: JSON.stringify({ theme, genre, artist }),
       });
       const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'Lyrics generation failed');
+      }
+
       if (data.lyrics) {
         setLyrics(data.lyrics);
         setStep(2);
       }
-    } catch (error) {
-      console.error('Lyrics generation failed:', error);
+    } catch (err: any) {
+      console.error('Lyrics generation failed:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -38,6 +46,7 @@ export default function SongGeneratorForm() {
 
   const handleGenerateMusic = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch('/api/generate-music', {
         method: 'POST',
@@ -45,11 +54,17 @@ export default function SongGeneratorForm() {
         body: JSON.stringify({ lyrics, genre, artist }),
       });
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Music generation failed');
+      }
+
       if (data.songId) {
         router.push(`/songs/${data.songId}`);
       }
-    } catch (error) {
-      console.error('Music generation failed:', error);
+    } catch (err: any) {
+      console.error('Music generation failed:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -72,6 +87,11 @@ export default function SongGeneratorForm() {
       </div>
 
       <div className="glass rounded-3xl p-8 md:p-12">
+        {error && (
+          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm font-medium animate-in fade-in slide-in-from-top-2">
+            {error}
+          </div>
+        )}
         {step === 1 && (
           <div className="space-y-8">
             <div className="text-center space-y-2">
