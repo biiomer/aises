@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "AISES - AI Şarkı Üretim Platformu",
   description: "Türkiye'nin öncü AI destekli müzik üretim platformu.",
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({
