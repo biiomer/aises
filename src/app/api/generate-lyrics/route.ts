@@ -5,6 +5,12 @@ export async function POST(req: NextRequest) {
   try {
     const { theme, genre, artist } = await req.json();
 
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json({ 
+        error: 'GEMINI_API_KEY eksik. Lütfen Vercel veya .env.local ayarlarınızı kontrol edin.' 
+      }, { status: 500 });
+    }
+
     const model = getGeminiModel();
 
     const prompt = `Sen profesyonel bir Türkçe şarkı sözü yazarısın.
@@ -43,13 +49,13 @@ SADECE şarkı sözlerini yaz, başka açıklama yapma.`;
       }, { status: 401 });
     }
 
-    if (error instanceof Error && error.message?.includes('429 Too Many Requests')) {
+    if (error instanceof Error && (error.message?.includes('429') || error.message?.includes('quota'))) {
       return NextResponse.json({ 
         error: 'Gemini API kullanım kotası doldu (Free Tier). Lütfen 1 dakika bekleyip tekrar deneyin veya ücretli plana geçin.' 
       }, { status: 429 });
     }
 
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen bir hata oluştu';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
