@@ -3,9 +3,9 @@ import SongCard from '@/components/SongCard';
 
 // This would normally fetch from API or Supabase
 const mockSongs = [
-  { id: '1', title: 'Gece Yarısı', genre: 'Drill', artist_id: 'yodel', status: 'completed' as const },
-  { id: '2', title: 'Yalnızlık Şehri', genre: 'Rock', artist_id: 'ates', status: 'completed' as const },
-  { id: '3', title: 'Pembe Bulutlar', genre: 'Pop', artist_id: 'defne-cey', status: 'completed' as const },
+  { id: '1', title: 'Gece Yarısı', genre: 'Drill', artist_id: 'yodel', lyrics: '...', status: 'completed' as const },
+  { id: '2', title: 'Yalnızlık Şehri', genre: 'Rock', artist_id: 'ates', lyrics: '...', status: 'completed' as const },
+  { id: '3', title: 'Pembe Bulutlar', genre: 'Pop', artist_id: 'defne-cey', lyrics: '...', status: 'completed' as const },
 ];
 
 export default function SongsPage() {
