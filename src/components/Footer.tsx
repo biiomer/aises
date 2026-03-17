@@ -10,7 +10,7 @@ export default function Footer() {
             <span>AISES</span>
           </div>
           <p className="text-sm text-white/50">
-            Türkiye'nin ilk AI tabanlı müzik üretim platformu.
+            Türkiye&apos;nin ilk AI tabanlı müzik üretim platformu.
           </p>
         </div>
         <div>

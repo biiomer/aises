@@ -18,7 +18,7 @@ export interface Song {
   duration?: number;
   status: 'generating' | 'completed' | 'failed';
   created_at?: string;
-  metadata?: any;
+  metadata?: unknown;
 }
 
 export interface GenerateLyricsParams {

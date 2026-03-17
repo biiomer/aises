@@ -34,8 +34,16 @@ SADECE şarkı sözlerini yaz, başka açıklama yapma.`;
     const lyrics = result.response.text();
 
     return NextResponse.json({ lyrics });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Gemini error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    if (error instanceof Error && error.message?.includes('API key not valid')) {
+      return NextResponse.json({ 
+        error: 'Gemini API anahtarı geçersiz. Lütfen .env.local dosyasındaki GEMINI_API_KEY değerini kontrol edin.' 
+      }, { status: 401 });
+    }
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

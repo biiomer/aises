@@ -12,7 +12,7 @@ export default function Home() {
         <div className="max-w-4xl text-center z-10 space-y-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium animate-pulse">
             <Sparkles size={16} />
-            <span>Türkiye'nin ilk AI Müzik Platformu</span>
+            <span>Türkiye&apos;nin ilk AI Müzik Platformu</span>
           </div>
           <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-[0.9]">
             Hayalindeki <br /> <span className="text-blue-500">Şarkıyı Üret.</span>

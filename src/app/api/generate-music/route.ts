@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Generate music using MusicGen via Replicate
     // meta/musicgen:7a76a8258b23fae65c5a22debb8841d1d7e816b75c2f24218cd2bd8573787906
-    const output: any = await replicate.run(
+    const output = await replicate.run(
       'meta/musicgen:7a76a8258b23fae65c5a22debb8841d1d7e816b75c2f24218cd2bd8573787906',
       {
         input: {
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
           duration: 30,
         },
       }
-    );
+    ) as unknown as string;
 
     // 3. Update song record with audio URL
     const audioUrl = output; // MusicGen returns a URL to the audio file
@@ -55,8 +55,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ songId: song.id, audioUrl });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Music generation error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
