@@ -43,6 +43,12 @@ SADECE şarkı sözlerini yaz, başka açıklama yapma.`;
       }, { status: 401 });
     }
 
+    if (error instanceof Error && error.message?.includes('429 Too Many Requests')) {
+      return NextResponse.json({ 
+        error: 'Gemini API kullanım kotası doldu (Free Tier). Lütfen 1 dakika bekleyip tekrar deneyin veya ücretli plana geçin.' 
+      }, { status: 429 });
+    }
+
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
